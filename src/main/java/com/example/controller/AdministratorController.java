@@ -85,6 +85,9 @@ public class AdministratorController {
 		if (administratorService.checkMailAddress(form.getMailAddress()) != null) {
 			model.addAttribute("mailAddressError", "すでに登録されています。");
 			return toInsert(form, model);
+		} else if (form.getPassword().equals(form.getConfirmPassword()) == false) {
+			model.addAttribute("passwordError", "同じパスワードを入力してください");
+			return toInsert(form, model);
 		}
 
 		Administrator administrator = new Administrator();
