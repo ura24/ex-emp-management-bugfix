@@ -3,6 +3,8 @@ package com.example.controller;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +16,7 @@ import com.example.form.InsertAdministratorForm;
 import com.example.form.LoginForm;
 import com.example.service.AdministratorService;
 
+import ch.qos.logback.core.model.Model;
 import jakarta.servlet.http.HttpSession;
 
 /**
@@ -61,7 +64,7 @@ public class AdministratorController {
 	 * @return 管理者登録画面
 	 */
 	@GetMapping("/toInsert")
-	public String toInsert() {
+	public String toInsert(InsertAdministratorForm form, Model model) {
 		return "administrator/insert";
 	}
 
@@ -72,7 +75,12 @@ public class AdministratorController {
 	 * @return ログイン画面へリダイレクト
 	 */
 	@PostMapping("/insert")
-	public String insert(InsertAdministratorForm form) {
+	public String insert(@Validated InsertAdministratorForm form, BindingResult result, Model model) {
+		// 入力値にエラーがあった場合、入力画面に戻る
+		if (result.hasErrors()) {
+			return toInsert(form, model);
+		}
+
 		Administrator administrator = new Administrator();
 		// フォームからドメインにプロパティ値をコピー
 		BeanUtils.copyProperties(form, administrator);
