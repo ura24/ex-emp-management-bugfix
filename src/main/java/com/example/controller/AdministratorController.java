@@ -3,6 +3,7 @@ package com.example.controller;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +17,6 @@ import com.example.form.InsertAdministratorForm;
 import com.example.form.LoginForm;
 import com.example.service.AdministratorService;
 
-import ch.qos.logback.core.model.Model;
 import jakarta.servlet.http.HttpSession;
 
 /**
@@ -78,6 +78,12 @@ public class AdministratorController {
 	public String insert(@Validated InsertAdministratorForm form, BindingResult result, Model model) {
 		// 入力値にエラーがあった場合、入力画面に戻る
 		if (result.hasErrors()) {
+			return toInsert(form, model);
+		}
+
+		// 同じメールアドレスがすでに登録されていた場合、入力画面に戻る
+		if (administratorService.checkMailAddress(form.getMailAddress()) != null) {
+			model.addAttribute("mailAddressError", "すでに登録されています。");
 			return toInsert(form, model);
 		}
 
