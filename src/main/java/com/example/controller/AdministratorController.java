@@ -81,6 +81,7 @@ public class AdministratorController {
 			return toInsert(form, model);
 		}
 
+		// 同じメールアドレスがすでに登録されていた場合、入力画面に戻る
 		if (administratorService.checkMailAddress(form.getMailAddress()) != null) {
 			model.addAttribute("mailAddressError", "すでに登録されています。");
 			return toInsert(form, model);
