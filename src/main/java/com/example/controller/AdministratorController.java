@@ -76,6 +76,7 @@ public class AdministratorController {
 	 */
 	@PostMapping("/insert")
 	public String insert(@Validated InsertAdministratorForm form, BindingResult result, Model model) {
+		// 入力値にエラーがあった場合、入力画面に戻る
 		if (result.hasErrors()) {
 			return toInsert(form, model);
 		}
