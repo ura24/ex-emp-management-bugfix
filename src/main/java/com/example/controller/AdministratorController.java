@@ -81,9 +81,13 @@ public class AdministratorController {
 			return toInsert(form, model);
 		}
 
-		// 同じメールアドレスがすでに登録されていた場合、入力画面に戻る
 		if (administratorService.checkMailAddress(form.getMailAddress()) != null) {
+			// 同じメールアドレスがすでに登録されていた場合、入力画面に戻る
 			model.addAttribute("mailAddressError", "すでに登録されています。");
+			return toInsert(form, model);
+		} else if (form.getPassword().equals(form.getConfirmPassword()) == false) {
+			// パスワードと確認用パスワードの値が異なる場合、入力画面に戻る
+			model.addAttribute("passwordError", "同じパスワードを入力してください");
 			return toInsert(form, model);
 		}
 
