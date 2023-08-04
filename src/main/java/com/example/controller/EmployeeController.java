@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.domain.Employee;
+import com.example.form.SearchForm;
 import com.example.form.UpdateEmployeeForm;
 import com.example.service.EmployeeService;
 
@@ -49,7 +51,7 @@ public class EmployeeController {
 	 * @return 従業員一覧画面
 	 */
 	@GetMapping("/showList")
-	public String showList(Model model) {
+	public String showList(Model model, SearchForm form) {
 		List<Employee> employeeList = employeeService.showList();
 		model.addAttribute("employeeList", employeeList);
 		return "employee/list";
@@ -91,5 +93,37 @@ public class EmployeeController {
 		employee.setDependentsCount(form.getIntDependentsCount());
 		employeeService.update(employee);
 		return "redirect:/employee/showList";
+	}
+
+	/////////////////////////////////////////////////////
+	// ユースケース：従業員名で検索する
+	/////////////////////////////////////////////////////
+	/**
+	 * 従業員名で検索した結果を、一覧画面に表示します。
+	 * @param form 従業員名フォーム
+	 * @param model モデル
+	 * @return 従業員一覧画面
+	 */
+	@PostMapping("/search")
+	public String search(SearchForm form, Model model) {
+		List<Employee> employeeList = new ArrayList<>();
+
+		if (form.getName() == null) {
+			// 値がない場合は、従業員一覧を出力
+			employeeList = employeeService.showList();
+		
+		} else {
+			// 入力された従業員名で検索された従業員一覧を出力
+			employeeList = 	employeeService.search(form.getName());
+
+			// 検索結果が0件だった場合、従業員一覧を出力
+			if (employeeList.isEmpty()) {
+				model.addAttribute("noSearchResult", "１件もありませんでした");
+				employeeList = employeeService.showList();
+			}
+		}
+
+		model.addAttribute("employeeList", employeeList);
+		return "employee/list";
 	}
 }

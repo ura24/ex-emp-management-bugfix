@@ -78,9 +78,34 @@ public class EmployeeRepository {
 	 * 従業員情報を変更します.
 	 */
 	public void update(Employee employee) {
+		String updateSql = "UPDATE employees SET dependents_count=:dependentsCount WHERE id=:id";
+		
 		SqlParameterSource param = new BeanPropertySqlParameterSource(employee);
 
-		String updateSql = "UPDATE employees SET dependents_count=:dependentsCount WHERE id=:id";
 		template.update(updateSql, param);
+	}
+
+	/**
+	 * 従業員名で曖昧検索をします。
+	 * @param name 従業員名
+	 * @return 検索した従業員情報一覧
+	 */
+	public List<Employee> search(String name) {
+		String searchSql = """
+			SELECT
+				id,name,image,gender,hire_date,mail_address,zip_code,address,telephone,salary,characteristics,dependents_count
+			FROM
+				employees
+			WHERE
+				name LIKE '%' || :name || '%'
+			ORDER BY
+				hire_date DESC
+			""";
+		
+		SqlParameterSource param = new MapSqlParameterSource().addValue("name", name);
+		
+		List<Employee> searchResult = template.query(searchSql, param, EMPLOYEE_ROW_MAPPER);
+		
+		return searchResult;
 	}
 }
