@@ -99,7 +99,10 @@
 
           <form action="#" th:action="@{/employee/search}" th:object="${searchForm}" method="post" style="margin: 0 auto; text-align: center;">
             <label for="name">従業員検索：
-              <input type="text" name="name" th:field="*{name}">
+              <input type="text" name="name" autocomplete="name" list="employeeList" th:field="*{name}">
+              <datalist id="employeeList">
+              <option th:each="employee:${employeeList}" th:value="${employee.name}"></option>
+            </datalist>
             </label>
             <button type="submit">検索</button>
             <div
