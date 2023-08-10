@@ -16,36 +16,31 @@ import com.example.domain.LoginAdministrator;
 import com.example.repository.AdministratorRepository;
 
 /**
- * ログイン後の管理者情報に権限情報を付与するサービスクラス.
- * 
- * @author igamasayuki
- *
+ * ログイン後の管理者情報に権限情報を付与するサービスクラス
  */
 @Service
 public class AdministratorDetailsServiceImpl implements UserDetailsService {
-	/** DBから情報を得るためのリポジトリ */
+
+	/** 管理者テーブルから情報を取得するレポジトリ */
 	@Autowired
 	private AdministratorRepository administratorRepository;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.security.core.userdetails.UserDetailsService#
-	 * loadUserByUsername(java.lang.String) DBから検索をし、ログイン情報を構成して返す。
+	/**
+	 * 管理者テーブルから検索して、ログイン情報をログイン情報を構成して返す
+	 * @return ログイン情報
 	 */
 	@Override
-	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-		System.out.println("email:" + email);
-		Administrator administrator = administratorRepository.findByMailAddress(email);
-		if (administrator == null) {
-			throw new UsernameNotFoundException("そのEmailは登録されていません。");
+	public UserDetails loadUserByUsername(String mailAddress) throws UsernameNotFoundException {
+		Administrator admin = administratorRepository.findByMailAddress(mailAddress);
+		if (admin == null) {
+			throw new UsernameNotFoundException("そのメールアドレスは登録されていません。");
 		}
-		// 権限付与の例
+
 		Collection<GrantedAuthority> authorityList = new ArrayList<>();
-		authorityList.add(new SimpleGrantedAuthority("ROLE_USER")); // ユーザ権限付与
-//		if(administrator.isAdmin()) {
-//			authorityList.add(new SimpleGrantedAuthority("ROLE_ADMIN")); // 管理者権限付与
-//		}
-		return new LoginAdministrator(administrator, authorityList);
+		// ユーザ権限付与
+		authorityList.add(new SimpleGrantedAuthority("ROLE_USER"));
+
+		return new LoginAdministrator(admin, authorityList);
 	}
+
 }
