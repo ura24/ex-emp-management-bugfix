@@ -108,4 +108,52 @@ public class EmployeeRepository {
 		
 		return searchResult;
 	}
+
+	/**
+	 * 従業員情報を挿入します
+	 * @param employee 従業員情報
+	 */
+	synchronized public void insert(Employee employee) {
+		// 登録する従業員のIDを設定
+		int currentId = template.queryForObject("SELECT COUNT(id) FROM employees", new MapSqlParameterSource(), Integer.class) + 1;
+		employee.setId(currentId);
+
+		String sql = """
+			INSERT INTO employees
+			(id, name, image, gender, hire_date, mail_address, zip_code, 
+			address, telephone, salary, characteristics, dependents_count)
+			VALUES
+			(:id, :name, :image, :gender, :hireDate, :mailAddress, :zipCode, 
+			:address, :telephone, :salary, :characteristics, :dependentsCount)
+			""";
+		SqlParameterSource param = new BeanPropertySqlParameterSource(employee);
+
+		template.update(sql, param);
+	}
+
+	/**
+	 * メールアドレスから従業員情報を検索します
+	 * @param mailAddress メールアドレス
+	 * @return メールアドレスに一致する従業員情報
+	 */
+	public Employee findByMailAddress(String mailAddress) {
+		String searchSql = """
+			SELECT
+				id,name,image,gender,hire_date,mail_address,zip_code,address,telephone,salary,characteristics,dependents_count
+			FROM
+				employees
+			WHERE
+				mail_address = :mailAddress
+			""";
+		
+		SqlParameterSource param = new MapSqlParameterSource().addValue("mailAddress", mailAddress);
+		
+		List<Employee> employeeList = template.query(searchSql, param, EMPLOYEE_ROW_MAPPER);
+		
+		if (employeeList.size() == 0) {
+			return null;
+		}
+		
+		return employeeList.get(0);
+	}
 }

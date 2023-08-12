@@ -65,6 +65,11 @@
                   >従業員管理</a
                 >
               </li>
+              <li>
+                <a href="insert.html" th:href="@{/employee/toInsert}"
+                >従業員登録</a
+                >
+              </li>
             </ul>
             <p class="navbar-text navbar-right">
               <span sec:authentication="principal.administrator.name">山田</span>さんこんにちは！&nbsp;&nbsp;&nbsp;
@@ -118,7 +123,11 @@
                     <td>
                       <img
                         src="../../static/img/e2.png"
-                        th:src="${'/img/' + employee.image}"
+                        th:src="
+                          ${employee.image == 'e1.png' or employee.image == 'e2.png' ? 
+                          '/img/' + employee.image : 
+                          employee.image}
+                          "
                       />
                     </td>
                   </tr>

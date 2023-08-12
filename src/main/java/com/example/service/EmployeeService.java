@@ -1,5 +1,8 @@
 package com.example.service;
 
+import java.io.IOException;
+import java.sql.Date;
+import java.util.Base64;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.domain.Employee;
+import com.example.form.InsertEmployeeForm;
 import com.example.repository.EmployeeRepository;
 
 /**
@@ -60,5 +64,47 @@ public class EmployeeService {
 	 */
 	public List<Employee> search(String name) {
 		return employeeRepository.search(name);
+	}
+
+	/**
+	 * 従業員情報を登録します
+	 * @param insertEmployeeForm 従業員登録フォーム
+	 * @param fileExtension 画像のファイル拡張子
+	 * @throws IOException 入出力例外
+	 */
+	public void insert(InsertEmployeeForm insertEmployeeForm, String fileExtension) throws IOException {
+		// 画像ファイルをBase64エンコードして、適切なデータURIを生成
+		String base64FileString = Base64.getEncoder().encodeToString(insertEmployeeForm.getImage().getBytes());
+		if ("jpg".equals(fileExtension)) {
+			base64FileString = "data:image/jpeg;base64," + base64FileString;
+		} else if ("png".equals(fileExtension)) {
+			base64FileString = "data:image/png;base64," + base64FileString;
+		}
+
+	    // 従業員情報を作成
+		Employee employee = new Employee(
+								insertEmployeeForm.getId(), 
+								insertEmployeeForm.getName(), 
+								base64FileString, 
+								insertEmployeeForm.getGender(), 
+								Date.valueOf(insertEmployeeForm.getHireDate()), 
+								insertEmployeeForm.getMailAddress(), 
+								insertEmployeeForm.getZipCode(), 
+								insertEmployeeForm.getAddress(), 
+								insertEmployeeForm.getTelephone(), 
+								Integer.parseInt(insertEmployeeForm.getSalary()), 
+								insertEmployeeForm.getCharacteristics(), 
+								Integer.parseInt(insertEmployeeForm.getDependentsCount()));
+
+		employeeRepository.insert(employee);
+	}
+
+	/**
+	 * メールアドレスから従業員情報を検索します
+	 * @param mailAddress メールアドレス
+	 * @return メールアドレスに一致する従業員情報
+	 */
+	public Employee searchByMailAddress(String mailAddress) {
+		return employeeRepository.findByMailAddress(mailAddress);
 	}
 }
