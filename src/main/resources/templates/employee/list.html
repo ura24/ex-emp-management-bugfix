@@ -125,7 +125,7 @@
                 <th>扶養人数</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody class="employeeList">
               <tr th:each="employee : ${employeeList}">
                 <td>
                   <a
@@ -144,6 +144,7 @@
               </tr>
             </tbody>
           </table>
+          <ul class="pagination"></ul>
 
           <!-- ここから下を編集する必要はありません -->
         </div>
@@ -153,5 +154,6 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="../../static/js/bootstrap.min.js" th:src=@{/js/bootstrap.min.js}></script>
+    <script th:src="@{/js/pagination.js}"></script>
   </body>
 </html>
